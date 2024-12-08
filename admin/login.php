@@ -1,10 +1,11 @@
 <?php
 session_start();
 include '../includes/db_connect.php';
+include '../includes/helpers.php'
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
+if ($_SERVER['REQUEST_METHOD'] == 'POST') { 
+    $username = sanitizeInput($_POST['username']); 
+    $password = sanitizeInput($_POST['password']);
 
     $stmt = $conn->prepare('SELECT id, username, password, user_type FROM users WHERE username = ?');
     $stmt->bind_param('s', $username);
