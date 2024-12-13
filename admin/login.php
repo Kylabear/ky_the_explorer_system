@@ -41,29 +41,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="../public/assets/tailwind.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <title>Admin Login</title>
 </head>
-<body class="bg-gradient-to-r from-purple-500 via-blue-500 to-green-500 flex items-center justify-center min-h-screen">
+<body class="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-400 via-pink-300 to-pink-500">
 
-    <div class="w-full max-w-sm p-8 space-y-6 bg-white bg-opacity-90 rounded-lg shadow-2xl transform transition-all duration-500 hover:scale-105">
-        <h2 class="text-3xl font-semibold text-center text-gray-800 animate__animated animate__fadeInUp">Admin Login</h2>
+    <div class="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
+        <h2 class="text-2xl font-bold text-center text-purple-600">Admin Login</h2>
         <form method="POST" class="space-y-4">
-            <div class="animate__animated animate__fadeInUp animate__delay-1s">
-                <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
-                <input type="text" name="username" id="username" placeholder="Enter your username" class="w-full p-3 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition duration-300 ease-in-out transform hover:scale-105" required>
-            </div>
-            <div class="animate__animated animate__fadeInUp animate__delay-2s">
-                <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                <input type="password" name="password" id="password" placeholder="Enter your password" class="w-full p-3 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition duration-300 ease-in-out transform hover:scale-105" required>
-            </div>
-            <div>
-                <button type="submit" class="w-full p-3 text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 transition duration-300 ease-in-out transform hover:scale-105">
-                    Login
-                </button>
-            </div>
+            <input type="text" name="username" placeholder="Username" class="w-full p-2 border border-purple-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-500" required>
+            <input type="password" name="password" placeholder="Password" class="w-full p-2 border border-purple-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-500" required>
+            <button type="submit" class="w-full p-2 text-white bg-purple-600 rounded hover:bg-purple-700 transition duration-300">Login</button>
         </form>
-        <p class="text-center text-sm text-gray-600 animate__animated animate__fadeInUp animate__delay-3s">
+        <p class="text-center text-sm text-gray-600">
             Don't have an account? <a href="register.php" class="text-blue-600 hover:underline">Register</a>
         </p>
     </div>
