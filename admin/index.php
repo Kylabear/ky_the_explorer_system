@@ -47,6 +47,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_content'])) {
 // Fetch existing content
 $table = isset($_GET['type']) && $_GET['type'] === 'cafe' ? 'cafes' : 'restaurants';
 $result = $conn->query("SELECT * FROM $table");
+
+// Edit content logic
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_content'])) {
+    $id = $_POST['id'];
+    $name = $_POST['name'];
+    $description = $_POST['description'];
+    $location = $_POST['location'];
+    $address = $_POST['address'];
+    $features = implode(', ', $_POST['features']);
+    $inclusions = implode(', ', $_POST['inclusions']);
+    $drink_pricing = $_POST['drink_pricing'];
+    $food_pricing = $_POST['food_pricing'];
+    $ideal_for = implode(', ', $_POST['ideal_for']);
+    
+    // Handle image update
+    $image = '';
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        $image_path = 'uploads/' . basename($_FILES['image']['name']);
+        move_uploaded_file($_FILES['image']['tmp_name'], $image_path);
+        $image = $image_path;
+    } elseif (!empty($_POST['image_url'])) {
+        $image = $_POST['image_url'];
+    }
+
+    $stmt = $conn->prepare("UPDATE $table SET name = ?, description = ?, location = ?, address = ?, features = ?, inclusions = ?, drink_pricing = ?, food_pricing = ?, ideal_for = ?, image = ? WHERE id = ?");
+    $stmt->bind_param('ssssssssssi', $name, $description, $location, $address, $features, $inclusions, $drink_pricing, $food_pricing, $ideal_for, $image, $id);
+
+    if ($stmt->execute()) {
+        $success_message = "Successfully updated $name.";
+    } else {
+        $error_message = "Error: Could not update content.";
+    }
+
+    $stmt->close();
+}
+
+// Delete content logic
+if (isset($_GET['delete_id'])) {
+    $delete_id = $_GET['delete_id'];
+    $stmt = $conn->prepare("DELETE FROM $table WHERE id = ?");
+    $stmt->bind_param('i', $delete_id);
+    if ($stmt->execute()) {
+        header("Location: index.php?type=" . $_GET['type']);
+    } else {
+        $error_message = "Error: Could not delete content.";
+    }
+    $stmt->close();
+}
 ?>
 
 <!DOCTYPE html>
@@ -148,8 +196,11 @@ $result = $conn->query("SELECT * FROM $table");
                                 <td class="border p-2"><?= htmlspecialchars($row['name']) ?></td>
                                 <td class="border p-2"><?= htmlspecialchars($row['description']) ?></td>
                                 <td class="border p-2">
-                                    <a href="edit_content.php?id=<?= $row['id'] ?>" class="bg-yellow-500 text-white py-1 px-4 rounded hover:bg-yellow-600">Edit</a>
-                                    <a href="delete_content.php?id=<?= $row['id'] ?>" class="bg-red-500 text-white py-1 px-4 rounded hover:bg-red-600">Delete</a>
+                                    <!-- Edit Button -->
+                                    <button onclick="openEditModal(<?= $row['id'] ?>, '<?= htmlspecialchars($row['name']) ?>', '<?= htmlspecialchars($row['description']) ?>')" class="bg-yellow-500 text-white py-1 px-4 rounded hover:bg-yellow-600">Edit</button>
+
+                                    <!-- Delete Button -->
+                                    <button onclick="openDeleteModal(<?= $row['id'] ?>)" class="bg-red-500 text-white py-1 px-4 rounded hover:bg-red-600">Delete</button>
                                 </td>
                             </tr>
                         <?php endwhile; ?>
@@ -160,5 +211,62 @@ $result = $conn->query("SELECT * FROM $table");
             <?php endif; ?>
         </section>
     </main>
+
+    <!-- Edit Content Modal -->
+    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center flex items-center">
+        <div class="bg-white p-4 rounded-lg max-w-xl">
+            <h2 class="text-xl font-semibold">Edit Content</h2>
+            <form method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="id" id="editId">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" name="name" id="editName" placeholder="Name" class="border rounded p-2" required>
+                    <textarea name="description" id="editDescription" placeholder="Description" class="border rounded p-2" required></textarea>
+                    <input type="text" name="location" id="editLocation" placeholder="Location" class="border rounded p-2" required>
+                    <input type="text" name="address" id="editAddress" placeholder="Address" class="border rounded p-2" required>
+                </div>
+                <div class="mt-4">
+                    <label for="editImage">Upload Image</label>
+                    <input type="file" name="image" id="editImage" class="border rounded p-2">
+                </div>
+                <button type="submit" name="edit_content" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Save Changes</button>
+            </form>
+            <button onclick="closeModal()" class="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Close</button>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center flex items-center">
+        <div class="bg-white p-4 rounded-lg">
+            <h2 class="text-lg font-semibold">Are you sure you want to delete this content?</h2>
+            <div class="mt-4">
+                <button id="deleteConfirm" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Yes</button>
+                <button onclick="closeDeleteModal()" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">No</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openEditModal(id, name, description) {
+            document.getElementById('editModal').classList.remove('hidden');
+            document.getElementById('editId').value = id;
+            document.getElementById('editName').value = name;
+            document.getElementById('editDescription').value = description;
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').classList.add('hidden');
+        }
+
+        function openDeleteModal(id) {
+            document.getElementById('deleteModal').classList.remove('hidden');
+            document.getElementById('deleteConfirm').onclick = function() {
+                window.location.href = '?delete_id=' + id;
+            };
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.add('hidden');
+        }
+    </script>
 </body>
 </html>
