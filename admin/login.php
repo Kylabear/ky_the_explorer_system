@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <body class="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-400 via-pink-300 to-pink-500">
 
     <div class="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
-        <h2 class="text-2xl font-bold text-center text-purple-600">Admin Login</h2>
+        <h2 class="text-2xl font-bold text-center text-purple-600">Login</h2>
         <form method="POST" class="space-y-4">
             <input type="text" name="username" placeholder="Username" class="w-full p-2 border border-purple-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-500" required>
             <input type="password" name="password" placeholder="Password" class="w-full p-2 border border-purple-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-500" required>

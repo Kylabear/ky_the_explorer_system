@@ -8,7 +8,6 @@ if (!isAdmin()) {
     exit();
 }
 
-// Add content logic
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_content'])) {
     $name = $_POST['name'];
     $description = $_POST['description'];
@@ -20,14 +19,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_content'])) {
     $food_pricing = $_POST['food_pricing'];
     $ideal_for = implode(', ', $_POST['ideal_for']);
     
-    // Handle image upload
     $image = '';
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         $image_path = 'uploads/' . basename($_FILES['image']['name']);
         move_uploaded_file($_FILES['image']['tmp_name'], $image_path);
         $image = $image_path;
     } elseif (!empty($_POST['image_url'])) {
-        $image = $_POST['image_url'];  // Using URL if provided
+        $image = $_POST['image_url'];  
     }
 
     $table = $_POST['type'] === 'cafe' ? 'cafes' : 'restaurants';
@@ -61,7 +59,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_content'])) {
     $food_pricing = $_POST['food_pricing'];
     $ideal_for = implode(', ', $_POST['ideal_for']);
     
-    // Handle image update
     $image = '';
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         $image_path = 'uploads/' . basename($_FILES['image']['name']);
@@ -115,7 +112,7 @@ if (isset($_GET['delete_id'])) {
 
     <!-- Main Content -->
     <main class="container mx-auto flex-grow flex flex-col md:flex-row mt-8">
-        <!-- Sidebar -->
+
         <nav class="bg-white shadow-lg rounded-lg p-4 w-full md:w-1/4 mb-6 md:mb-0">
             <ul class="space-y-4">
                 <li><a href="?type=cafe" class="block bg-pink-400 text-white py-2 px-4 rounded-lg text-center hover:bg-pink-500 transition duration-300">Manage Cafes</a></li>
@@ -180,7 +177,6 @@ if (isset($_GET['delete_id'])) {
                     <div class="mt-4 bg-red-100 text-red-700 p-2 rounded"> <?= $error_message ?> </div>
                 <?php endif; ?>
 
-                <!-- Display Existing Content -->
                 <h3 class="text-lg font-semibold text-gray-700 mt-8">Existing <?= ucfirst($_GET['type']) ?></h3>
                 <table class="table-auto w-full mt-4 border-collapse">
                     <thead>
@@ -212,7 +208,6 @@ if (isset($_GET['delete_id'])) {
         </section>
     </main>
 
-    <!-- Edit Content Modal -->
     <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center flex items-center">
         <div class="bg-white p-4 rounded-lg max-w-xl">
             <h2 class="text-xl font-semibold">Edit Content</h2>
