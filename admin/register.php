@@ -7,19 +7,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = sanitizeInput($_POST['username']);
     $password = sanitizeInput($_POST['password']);
     $email = sanitizeInput($_POST['email']);
+    $user_type = sanitizeInput($_POST['user_type']); 
 
-    // Hash the password before storing it
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-    // Insert user into database
     $stmt = $conn->prepare('INSERT INTO users (username, password, email, user_type) VALUES (?, ?, ?, ?)');
-    $user_type = 'tourist'; // Default user type
     $stmt->bind_param('ssss', $username, $hashed_password, $email, $user_type);
 
     if ($stmt->execute()) {
         $_SESSION['username'] = $username;
         $_SESSION['user_type'] = $user_type;
-        header('Location: ../public/index.php');
+
+        if ($user_type === 'admin') {
+            header('Location: index.php'); 
+        } else {
+            header('Location: ../public/index.php'); 
+        }
         exit();
     } else {
         echo displayError('Registration failed');
@@ -42,6 +45,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <input type="text" name="username" placeholder="Username" class="w-full p-2 border border-purple-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-500" required>
             <input type="email" name="email" placeholder="Email" class="w-full p-2 border border-purple-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-500" required>
             <input type="password" name="password" placeholder="Password" class="w-full p-2 border border-purple-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-500" required>
+            <select name="user_type" class="w-full p-2 border border-purple-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-500" required>
+                <option value="tourist">Tourist</option>
+                <option value="admin">Admin</option>
+            </select>
             <button type="submit" class="w-full p-2 text-white bg-purple-600 rounded hover:bg-purple-700 transition duration-300">Register</button>
         </form>
         <a href="login.php" class="block text-center text-purple-600 hover:underline">Already have an account? Login</a>
