@@ -91,6 +91,7 @@ if (isset($_GET['delete_id'])) {
 
     if ($stmt->execute()) {
         header("Location: index.php?type=" . $_GET['type']);
+        exit();
     } else {
         $error_message = "Error: Could not delete content.";
     }
@@ -198,7 +199,7 @@ if (isset($_GET['delete_id'])) {
                                 <td class="border p-2"> <?= htmlspecialchars($row['name']) ?> </td>
                                 <td class="border p-2"> <?= htmlspecialchars($row['description']) ?> </td>
                                 <td class="border p-2">
-                                    <button onclick="openEditModal(<?= $row['id'] ?>, '<?= htmlspecialchars($row['name']) ?>', '<?= htmlspecialchars($row['description']) ?>')" class="bg-yellow-500 text-white py-1 px-4 rounded hover:bg-yellow-600">Edit</button>
+                                    <button onclick="openEditModal(<?= $row['id'] ?>, '<?= htmlspecialchars($row['name']) ?>', '<?= htmlspecialchars($row['description']) ?>', '<?= htmlspecialchars($row['location']) ?>', '<?= htmlspecialchars($row['address']) ?>', '<?= htmlspecialchars($row['features']) ?>', '<?= htmlspecialchars($row['inclusions']) ?>', '<?= htmlspecialchars($row['drink_pricing']) ?>', '<?= htmlspecialchars($row['food_pricing']) ?>', '<?= htmlspecialchars($row['ideal_for']) ?>', '<?= htmlspecialchars($row['image']) ?>')" class="bg-yellow-500 text-white py-1 px-4 rounded hover:bg-yellow-600">Edit</button>
                                     <button onclick="openDeleteModal(<?= $row['id'] ?>)" class="bg-red-500 text-white py-1 px-4 rounded hover:bg-red-600">Delete</button>
                                 </td>
                             </tr>
@@ -222,10 +223,30 @@ if (isset($_GET['delete_id'])) {
                     <textarea name="description" id="editDescription" placeholder="Description" class="border rounded p-2" required></textarea>
                     <input type="text" name="location" id="editLocation" placeholder="Location" class="border rounded p-2" required>
                     <input type="text" name="address" id="editAddress" placeholder="Address" class="border rounded p-2" required>
+                    <fieldset>
+                        <legend>Features:</legend>
+                        <label><input type="checkbox" name="features[]" value="Indoor Seating" id="editFeature1"> Indoor Seating</label>
+                        <label><input type="checkbox" name="features[]" value="Outdoor Seating" id="editFeature2"> Outdoor Seating</label>
+                        <label><input type="checkbox" name="features[]" value="Instagramable Decor" id="editFeature3"> Instagramable Decor</label>
+                    </fieldset>
+                    <fieldset>
+                        <legend>Inclusions:</legend>
+                        <label><input type="checkbox" name="inclusions[]" value="Charging Port" id="editInclusion1"> Charging Port</label>
+                        <label><input type="checkbox" name="inclusions[]" value="WiFi" id="editInclusion2"> WiFi</label>
+                    </fieldset>
+                    <input type="text" name="drink_pricing" id="editDrinkPricing" placeholder="Drink Pricing" class="border rounded p-2" required>
+                    <input type="text" name="food_pricing" id="editFoodPricing" placeholder="Food Pricing" class="border rounded p-2" required>
+                    <fieldset>
+                        <legend>Ideal For:</legend>
+                        <label><input type="checkbox" name="ideal_for[]" value="Student" id="editIdeal1"> Student</label>
+                        <label><input type="checkbox" name="ideal_for[]" value="Work Friendly" id="editIdeal2"> Work Friendly</label>
+                    </fieldset>
                 </div>
                 <div class="mt-4">
                     <label for="editImage">Upload Image</label>
                     <input type="file" name="image" id="editImage" class="border rounded p-2">
+                    <small>OR</small>
+                    <input type="text" name="image_url" id="editImageUrl" placeholder="Image URL" class="border rounded p-2">
                 </div>
                 <button type="submit" name="edit_content" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Save Changes</button>
             </form>
@@ -244,11 +265,34 @@ if (isset($_GET['delete_id'])) {
     </div>
 
     <script>
-        function openEditModal(id, name, description) {
+        function openEditModal(id, name, description, location, address, features, inclusions, drinkPricing, foodPricing, idealFor, image) {
             document.getElementById('editModal').classList.remove('hidden');
             document.getElementById('editId').value = id;
             document.getElementById('editName').value = name;
             document.getElementById('editDescription').value = description;
+            document.getElementById('editLocation').value = location;
+            document.getElementById('editAddress').value = address;
+            document.getElementById('editDrinkPricing').value = drinkPricing;
+            document.getElementById('editFoodPricing').value = foodPricing;
+            document.getElementById('editImageUrl').value = image;
+
+            // Populate checkboxes
+            const featureList = features.split(', ');
+            document.querySelectorAll('[name="features[]"]').forEach((checkbox) => {
+                checkbox.checked = featureList.includes(checkbox.value);
+            });
+
+            // Populate checkboxes for inclusions
+            const inclusionList = inclusions.split(', ');
+            document.querySelectorAll('[name="inclusions[]"]').forEach((checkbox) => {
+                checkbox.checked = inclusionList.includes(checkbox.value);
+            });
+
+            // Populate checkboxes for idealFor
+            const idealForList = idealFor.split(', ');
+            document.querySelectorAll('[name="ideal_for[]"]').forEach((checkbox) => {
+                checkbox.checked = idealForList.includes(checkbox.value);
+            });
         }
 
         function closeModal() {
@@ -257,7 +301,7 @@ if (isset($_GET['delete_id'])) {
 
         function openDeleteModal(id) {
             document.getElementById('deleteModal').classList.remove('hidden');
-            document.getElementById('deleteConfirm').onclick = function() {
+            document.getElementById('deleteConfirm').onclick = function () {
                 window.location.href = '?delete_id=' + id;
             };
         }
@@ -266,5 +310,8 @@ if (isset($_GET['delete_id'])) {
             document.getElementById('deleteModal').classList.add('hidden');
         }
     </script>
+
+    <div id="editModal" class="hidden">...</div>
+    <div id="deleteModal" class="hidden">...</div>
 </body>
 </html>
